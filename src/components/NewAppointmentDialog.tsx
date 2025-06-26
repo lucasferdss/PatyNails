@@ -25,11 +25,30 @@ export const NewAppointmentDialog = () => {
   const { toast } = useToast();
 
   const formatDateForStorage = (date: Date) => {
-    // Garantir que a data seja formatada corretamente sem problemas de fuso horário
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    // Criar uma nova data para evitar problemas de timezone
+    const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+    const day = String(localDate.getDate()).padStart(2, '0');
+    const month = String(localDate.getMonth() + 1).padStart(2, '0');
+    const year = localDate.getFullYear();
+    
+    console.log('Data original:', date);
+    console.log('Data local ajustada:', localDate);
+    console.log('Data formatada para storage:', `${day}/${month}/${year}`);
+    
+    return `${day}/${month}/${year}`;
+  };
+
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    console.log('Data selecionada no calendário:', selectedDate);
+    if (selectedDate) {
+      // Garantir que estamos trabalhando com o meio-dia para evitar problemas de timezone
+      const adjustedDate = new Date(selectedDate);
+      adjustedDate.setHours(12, 0, 0, 0);
+      console.log('Data ajustada:', adjustedDate);
+      setDate(adjustedDate);
+    } else {
+      setDate(undefined);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -47,9 +66,17 @@ export const NewAppointmentDialog = () => {
     const selectedService = services.find(s => s.id === selectedServiceId);
     if (!selectedService) return;
 
+    const formattedDate = formatDateForStorage(date);
+    
+    console.log('Dados do agendamento:');
+    console.log('Cliente:', clientName);
+    console.log('Data formatada:', formattedDate);
+    console.log('Horário:', time);
+    console.log('Serviço:', selectedService.name);
+
     addAppointment({
       clientName,
-      date: formatDateForStorage(date),
+      date: formattedDate,
       time,
       serviceId: selectedServiceId,
       serviceName: selectedService.name,
@@ -112,7 +139,7 @@ export const NewAppointmentDialog = () => {
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={handleDateSelect}
                   initialFocus
                   className="pointer-events-auto"
                 />

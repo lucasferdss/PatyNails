@@ -19,9 +19,24 @@ const AgendaPage = () => {
     return format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR });
   };
 
+  const parseDateFromStorage = (dateString: string): Date => {
+    // Se a data está no formato dd/mm/yyyy
+    if (dateString.includes('/')) {
+      const [day, month, year] = dateString.split('/');
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
+    // Se a data está no formato antigo yyyy-mm-dd
+    return new Date(dateString);
+  };
+
   const getAppointmentsForDate = (date: Date) => {
+    console.log('Buscando agendamentos para:', date);
+    console.log('Agendamentos disponíveis:', appointments);
+    
     return appointments.filter(appointment => {
-      const appointmentDate = new Date(appointment.date);
+      const appointmentDate = parseDateFromStorage(appointment.date);
+      console.log('Comparando:', appointmentDate, 'com', date);
+      console.log('É o mesmo dia?', isSameDay(appointmentDate, date));
       return isSameDay(appointmentDate, date) && appointment.status === 'scheduled';
     });
   };
@@ -31,7 +46,7 @@ const AgendaPage = () => {
   // Get dates that have appointments for highlighting
   const appointmentDates = appointments
     .filter(apt => apt.status === 'scheduled')
-    .map(apt => new Date(apt.date));
+    .map(apt => parseDateFromStorage(apt.date));
 
   const modifiers = {
     hasAppointment: appointmentDates,
