@@ -5,6 +5,7 @@ import HomePage from '@/components/HomePage';
 import AgendaPage from '@/components/AgendaPage';
 import FinanceiroPage from '@/components/FinanceiroPage';
 import ServicosPage from '@/components/ServicosPage';
+import { AppProvider } from '@/contexts/AppContext';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('inicio');
@@ -25,15 +26,17 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Main Content */}
-      <div className="min-h-screen">
-        {renderContent()}
+    <AppProvider>
+      <div className="min-h-screen bg-gray-50">
+        {/* Main Content */}
+        <div className="min-h-screen">
+          {renderContent()}
+        </div>
+        
+        {/* Bottom Navigation */}
+        <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
-      
-      {/* Bottom Navigation */}
-      <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
-    </div>
+    </AppProvider>
   );
 };
 

@@ -1,9 +1,25 @@
 
-import { Plus } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useApp } from '@/contexts/AppContext';
+import { NewServiceDialog } from './NewServiceDialog';
+import { useToast } from '@/hooks/use-toast';
 
 const ServicosPage = () => {
+  const { services, deleteService } = useApp();
+  const { toast } = useToast();
+
+  const handleDeleteService = (serviceId: string, serviceName: string) => {
+    if (confirm(`Tem certeza que deseja excluir o serviço "${serviceName}"?`)) {
+      deleteService(serviceId);
+      toast({
+        title: "Sucesso",
+        description: "Serviço excluído com sucesso!",
+      });
+    }
+  };
+
   return (
     <div className="p-4 pb-20 max-w-md mx-auto animate-fade-in">
       {/* Header */}
@@ -18,10 +34,7 @@ const ServicosPage = () => {
         
         {/* New Service Button */}
         <div className="flex justify-end mb-4">
-          <Button className="bg-primary-500 hover:bg-primary-600 text-white rounded-full px-6">
-            <Plus size={16} className="mr-2" />
-            Novo Serviço
-          </Button>
+          <NewServiceDialog />
         </div>
       </div>
 
@@ -37,9 +50,34 @@ const ServicosPage = () => {
       {/* Services List */}
       <Card>
         <CardContent className="p-6">
-          <div className="text-center py-8">
-            <p className="text-gray-500">Nenhum serviço cadastrado</p>
-          </div>
+          {services.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Nenhum serviço cadastrado</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {services.map((service) => (
+                <div key={service.id} className="grid grid-cols-3 gap-4 items-center py-3 border-b border-gray-100 last:border-b-0">
+                  <div>
+                    <h4 className="font-medium text-gray-800">{service.name}</h4>
+                  </div>
+                  <div className="text-center">
+                    <span className="text-gray-700">R$ {service.price.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteService(service.id, service.name)}
+                      className="text-red-600 border-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
