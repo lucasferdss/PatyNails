@@ -24,6 +24,14 @@ export const NewAppointmentDialog = () => {
   const { services, addAppointment } = useApp();
   const { toast } = useToast();
 
+  const formatDateForStorage = (date: Date) => {
+    // Garantir que a data seja formatada corretamente sem problemas de fuso horário
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -41,7 +49,7 @@ export const NewAppointmentDialog = () => {
 
     addAppointment({
       clientName,
-      date: format(date, 'yyyy-MM-dd'),
+      date: formatDateForStorage(date),
       time,
       serviceId: selectedServiceId,
       serviceName: selectedService.name,
