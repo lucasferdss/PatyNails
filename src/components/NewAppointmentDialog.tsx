@@ -105,7 +105,6 @@ export const NewAppointmentDialog = () => {
                   mode="single"
                   selected={date}
                   onSelect={setDate}
-                  disabled={(date) => date < new Date()}
                   initialFocus
                   className="pointer-events-auto"
                 />

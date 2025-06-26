@@ -1,16 +1,19 @@
 
 import { useState } from 'react';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
 import { format, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useApp } from '@/contexts/AppContext';
+import { useToast } from '@/hooks/use-toast';
 import { NewAppointmentDialog } from './NewAppointmentDialog';
 
 const AgendaPage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const { appointments } = useApp();
+  const { appointments, updateAppointmentStatus } = useApp();
+  const { toast } = useToast();
 
   const formatSelectedDate = () => {
     return format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR });
@@ -40,6 +43,23 @@ const AgendaPage = () => {
       color: 'white',
       borderRadius: '50%',
     },
+  };
+
+  const handleCompleteAppointment = (appointmentId: string, clientName: string) => {
+    updateAppointmentStatus(appointmentId, 'completed');
+    toast({
+      title: "Agendamento Concluído",
+      description: `Atendimento de ${clientName} marcado como concluído.`,
+    });
+  };
+
+  const handleCancelAppointment = (appointmentId: string, clientName: string) => {
+    updateAppointmentStatus(appointmentId, 'cancelled');
+    toast({
+      title: "Agendamento Cancelado",
+      description: `Atendimento de ${clientName} foi cancelado.`,
+      variant: "destructive",
+    });
   };
 
   return (
@@ -97,7 +117,7 @@ const AgendaPage = () => {
             <div className="space-y-4">
               {selectedDateAppointments.map((appointment) => (
                 <div key={appointment.id} className="bg-gray-50 p-4 rounded-lg">
-                  <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start mb-3">
                     <div>
                       <h4 className="font-medium text-gray-800">{appointment.clientName}</h4>
                       <p className="text-sm text-gray-600">{appointment.serviceName}</p>
@@ -106,6 +126,27 @@ const AgendaPage = () => {
                       <p className="text-sm font-medium text-primary-600">{appointment.time}</p>
                       <p className="text-sm text-gray-600">R$ {appointment.price.toFixed(2)}</p>
                     </div>
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 mt-3">
+                    <Button
+                      size="sm"
+                      onClick={() => handleCompleteAppointment(appointment.id, appointment.clientName)}
+                      className="bg-green-600 hover:bg-green-700 text-white flex-1"
+                    >
+                      <Check size={16} className="mr-1" />
+                      Concluir
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleCancelAppointment(appointment.id, appointment.clientName)}
+                      className="flex-1"
+                    >
+                      <X size={16} className="mr-1" />
+                      Cancelar
+                    </Button>
                   </div>
                 </div>
               ))}

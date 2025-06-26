@@ -9,6 +9,7 @@ interface AppContextType {
   deleteService: (id: string) => void;
   addAppointment: (appointment: Omit<Appointment, 'id' | 'createdAt'>) => void;
   updateAppointmentStatus: (id: string, status: 'completed' | 'cancelled') => void;
+  updateAppointmentPrice: (id: string, price: number) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -69,6 +70,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const updateAppointmentPrice = (id: string, price: number) => {
+    setAppointments(prev => 
+      prev.map(appointment => 
+        appointment.id === id ? { ...appointment, price } : appointment
+      )
+    );
+  };
+
   return (
     <AppContext.Provider value={{
       services,
@@ -77,6 +86,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       deleteService,
       addAppointment,
       updateAppointmentStatus,
+      updateAppointmentPrice,
     }}>
       {children}
     </AppContext.Provider>
