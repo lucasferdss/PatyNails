@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Service, Appointment } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,7 +8,7 @@ interface AppContextType {
   appointments: Appointment[];
   loading: boolean;
   addService: (service: Omit<Service, 'id'>) => Promise<void>;
-  deleteService: (id: string) => Promise<void>;
+  deleteService: (id: string) => Promise<{ success: boolean; message: string }>;
   addAppointment: (appointment: Omit<Appointment, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   updateAppointmentStatus: (id: string, status: 'completed' | 'cancelled') => Promise<void>;
   updateAppointmentPrice: (id: string, price: number) => Promise<void>;
@@ -119,8 +118,33 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const deleteService = async (id: string) => {
+  const deleteService = async (id: string): Promise<{ success: boolean; message: string }> => {
     try {
+      console.log('Tentando excluir serviço:', id);
+      
+      // Primeiro, verificar se há agendamentos associados a este serviço
+      const { data: appointmentsData, error: appointmentsError } = await supabase
+        .from('appointments')
+        .select('id')
+        .eq('service_id', id);
+
+      if (appointmentsError) {
+        console.error('Erro ao verificar agendamentos:', appointmentsError);
+        return {
+          success: false,
+          message: "Erro ao verificar agendamentos associados."
+        };
+      }
+
+      if (appointmentsData && appointmentsData.length > 0) {
+        console.log('Serviço possui agendamentos associados:', appointmentsData.length);
+        return {
+          success: false,
+          message: `Não é possível excluir este serviço pois existem ${appointmentsData.length} agendamento(s) associado(s) a ele.`
+        };
+      }
+
+      // Se não há agendamentos, proceder com a exclusão
       const { error } = await supabase
         .from('services')
         .delete()
@@ -128,22 +152,24 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) {
         console.error('Erro ao excluir serviço:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível excluir o serviço.",
-          variant: "destructive",
-        });
-        return;
+        return {
+          success: false,
+          message: "Não foi possível excluir o serviço."
+        };
       }
 
+      console.log('Serviço excluído com sucesso');
       setServices(prev => prev.filter(service => service.id !== id));
+      return {
+        success: true,
+        message: "Serviço excluído com sucesso!"
+      };
     } catch (error) {
       console.error('Erro ao excluir serviço:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível excluir o serviço.",
-        variant: "destructive",
-      });
+      return {
+        success: false,
+        message: "Erro inesperado ao excluir o serviço."
+      };
     }
   };
 

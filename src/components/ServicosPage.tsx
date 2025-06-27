@@ -13,11 +13,22 @@ const ServicosPage = () => {
 
   const handleDeleteService = async (serviceId: string, serviceName: string) => {
     if (confirm(`Tem certeza que deseja excluir o serviço "${serviceName}"?`)) {
-      await deleteService(serviceId);
-      toast({
-        title: "Sucesso",
-        description: "Serviço excluído com sucesso!",
-      });
+      console.log('Iniciando exclusão do serviço:', serviceId);
+      
+      const result = await deleteService(serviceId);
+      
+      if (result.success) {
+        toast({
+          title: "Sucesso",
+          description: result.message,
+        });
+      } else {
+        toast({
+          title: "Erro",
+          description: result.message,
+          variant: "destructive",
+        });
+      }
     }
   };
 
