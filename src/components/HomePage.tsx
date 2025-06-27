@@ -2,23 +2,38 @@
 import { Calendar, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useApp } from '@/contexts/AppContext';
-import { format, isToday, isTomorrow } from 'date-fns';
+import { format, isToday, isTomorrow, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { LoadingSpinner } from './LoadingSpinner';
 
 const HomePage = () => {
-  const { appointments } = useApp();
+  const { appointments, loading } = useApp();
+
+  const parseDateFromStorage = (dateString: string): Date => {
+    // Se a data está no formato dd/mm/yyyy
+    if (dateString.includes('/')) {
+      const [day, month, year] = dateString.split('/');
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
+    // Se a data está no formato antigo yyyy-mm-dd
+    return new Date(dateString);
+  };
 
   const todayAppointments = appointments.filter(appointment => {
-    const appointmentDate = new Date(appointment.date);
+    const appointmentDate = parseDateFromStorage(appointment.date);
     return isToday(appointmentDate) && appointment.status === 'scheduled';
   });
 
   const tomorrowAppointments = appointments.filter(appointment => {
-    const appointmentDate = new Date(appointment.date);
+    const appointmentDate = parseDateFromStorage(appointment.date);
     return isTomorrow(appointmentDate) && appointment.status === 'scheduled';
   });
 
   const renderAppointments = (appointmentsList: typeof appointments) => {
+    if (loading) {
+      return <LoadingSpinner className="py-6" />;
+    }
+
     if (appointmentsList.length === 0) {
       return (
         <div className="text-center py-6">
@@ -33,12 +48,12 @@ const HomePage = () => {
           <div key={appointment.id} className="bg-white p-3 rounded-lg border border-primary-100">
             <div className="flex justify-between items-start">
               <div>
-                <h4 className="font-medium text-gray-800">{appointment.clientName}</h4>
-                <p className="text-sm text-gray-600">{appointment.serviceName}</p>
+                <h4 className="font-medium text-gray-800">{appointment.client_name}</h4>
+                <p className="text-sm text-gray-600">{appointment.service_name}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm font-medium text-primary-600">{appointment.time}</p>
-                <p className="text-sm text-gray-600">R$ {appointment.price.toFixed(2)}</p>
+                <p className="text-sm text-gray-600">R$ {Number(appointment.price).toFixed(2)}</p>
               </div>
             </div>
           </div>

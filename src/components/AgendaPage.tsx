@@ -9,10 +9,11 @@ import { ptBR } from 'date-fns/locale';
 import { useApp } from '@/contexts/AppContext';
 import { useToast } from '@/hooks/use-toast';
 import { NewAppointmentDialog } from './NewAppointmentDialog';
+import { LoadingSpinner } from './LoadingSpinner';
 
 const AgendaPage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const { appointments, updateAppointmentStatus } = useApp();
+  const { appointments, updateAppointmentStatus, loading } = useApp();
   const { toast } = useToast();
 
   const formatSelectedDate = () => {
@@ -60,22 +61,30 @@ const AgendaPage = () => {
     },
   };
 
-  const handleCompleteAppointment = (appointmentId: string, clientName: string) => {
-    updateAppointmentStatus(appointmentId, 'completed');
+  const handleCompleteAppointment = async (appointmentId: string, clientName: string) => {
+    await updateAppointmentStatus(appointmentId, 'completed');
     toast({
       title: "Agendamento Concluído",
       description: `Atendimento de ${clientName} marcado como concluído.`,
     });
   };
 
-  const handleCancelAppointment = (appointmentId: string, clientName: string) => {
-    updateAppointmentStatus(appointmentId, 'cancelled');
+  const handleCancelAppointment = async (appointmentId: string, clientName: string) => {
+    await updateAppointmentStatus(appointmentId, 'cancelled');
     toast({
       title: "Agendamento Cancelado",
       description: `Atendimento de ${clientName} foi cancelado.`,
       variant: "destructive",
     });
   };
+
+  if (loading) {
+    return (
+      <div className="p-4 pb-20 max-w-md mx-auto animate-fade-in">
+        <LoadingSpinner className="mt-20" size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 pb-20 max-w-md mx-auto animate-fade-in">
@@ -134,12 +143,12 @@ const AgendaPage = () => {
                 <div key={appointment.id} className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <h4 className="font-medium text-gray-800">{appointment.clientName}</h4>
-                      <p className="text-sm text-gray-600">{appointment.serviceName}</p>
+                      <h4 className="font-medium text-gray-800">{appointment.client_name}</h4>
+                      <p className="text-sm text-gray-600">{appointment.service_name}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-primary-600">{appointment.time}</p>
-                      <p className="text-sm text-gray-600">R$ {appointment.price.toFixed(2)}</p>
+                      <p className="text-sm text-gray-600">R$ {Number(appointment.price).toFixed(2)}</p>
                     </div>
                   </div>
                   
@@ -147,7 +156,7 @@ const AgendaPage = () => {
                   <div className="flex gap-2 mt-3">
                     <Button
                       size="sm"
-                      onClick={() => handleCompleteAppointment(appointment.id, appointment.clientName)}
+                      onClick={() => handleCompleteAppointment(appointment.id, appointment.client_name)}
                       className="bg-green-600 hover:bg-green-700 text-white flex-1"
                     >
                       <Check size={16} className="mr-1" />
@@ -156,7 +165,7 @@ const AgendaPage = () => {
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() => handleCancelAppointment(appointment.id, appointment.clientName)}
+                      onClick={() => handleCancelAppointment(appointment.id, appointment.client_name)}
                       className="flex-1"
                     >
                       <X size={16} className="mr-1" />

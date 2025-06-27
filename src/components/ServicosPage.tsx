@@ -5,20 +5,29 @@ import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
 import { NewServiceDialog } from './NewServiceDialog';
 import { useToast } from '@/hooks/use-toast';
+import { LoadingSpinner } from './LoadingSpinner';
 
 const ServicosPage = () => {
-  const { services, deleteService } = useApp();
+  const { services, deleteService, loading } = useApp();
   const { toast } = useToast();
 
-  const handleDeleteService = (serviceId: string, serviceName: string) => {
+  const handleDeleteService = async (serviceId: string, serviceName: string) => {
     if (confirm(`Tem certeza que deseja excluir o serviço "${serviceName}"?`)) {
-      deleteService(serviceId);
+      await deleteService(serviceId);
       toast({
         title: "Sucesso",
         description: "Serviço excluído com sucesso!",
       });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="p-4 pb-20 max-w-md mx-auto animate-fade-in">
+        <LoadingSpinner className="mt-20" size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 pb-20 max-w-md mx-auto animate-fade-in">
@@ -62,7 +71,7 @@ const ServicosPage = () => {
                     <h4 className="font-medium text-gray-800">{service.name}</h4>
                   </div>
                   <div className="text-center">
-                    <span className="text-gray-700">R$ {service.price.toFixed(2)}</span>
+                    <span className="text-gray-700">R$ {Number(service.price).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-center">
                     <Button

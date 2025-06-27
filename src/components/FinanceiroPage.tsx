@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { LoadingSpinner } from './LoadingSpinner';
 
 const FinanceiroPage = () => {
   const [activeTab, setActiveTab] = useState('semana');
-  const { appointments, updateAppointmentStatus } = useApp();
+  const { appointments, updateAppointmentStatus, loading } = useApp();
 
   const now = new Date();
   const weekStart = startOfWeek(now, { weekStartsOn: 1 });
@@ -16,13 +17,23 @@ const FinanceiroPage = () => {
   const monthStart = startOfMonth(now);
   const monthEnd = endOfMonth(now);
 
+  const parseDateFromStorage = (dateString: string): Date => {
+    // Se a data está no formato dd/mm/yyyy
+    if (dateString.includes('/')) {
+      const [day, month, year] = dateString.split('/');
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
+    // Se a data está no formato antigo yyyy-mm-dd
+    return new Date(dateString);
+  };
+
   const getRevenueForPeriod = (start: Date, end: Date) => {
     return appointments
       .filter(apt => {
-        const aptDate = new Date(apt.date);
+        const aptDate = parseDateFromStorage(apt.date);
         return apt.status === 'completed' && isWithinInterval(aptDate, { start, end });
       })
-      .reduce((total, apt) => total + apt.price, 0);
+      .reduce((total, apt) => total + Number(apt.price), 0);
   };
 
   const weeklyRevenue = getRevenueForPeriod(weekStart, weekEnd);
@@ -30,7 +41,7 @@ const FinanceiroPage = () => {
 
   const getAppointmentsForPeriod = (start: Date, end: Date) => {
     return appointments.filter(apt => {
-      const aptDate = new Date(apt.date);
+      const aptDate = parseDateFromStorage(apt.date);
       return isWithinInterval(aptDate, { start, end });
     });
   };
@@ -47,9 +58,17 @@ const FinanceiroPage = () => {
     }
   };
 
-  const handleStatusChange = (appointmentId: string, newStatus: 'completed' | 'cancelled') => {
-    updateAppointmentStatus(appointmentId, newStatus);
+  const handleStatusChange = async (appointmentId: string, newStatus: 'completed' | 'cancelled') => {
+    await updateAppointmentStatus(appointmentId, newStatus);
   };
+
+  if (loading) {
+    return (
+      <div className="p-4 pb-20 max-w-md mx-auto animate-fade-in">
+        <LoadingSpinner className="mt-20" size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 pb-20 max-w-md mx-auto animate-fade-in">
@@ -121,14 +140,14 @@ const FinanceiroPage = () => {
                 <div key={appointment.id} className="border-b border-gray-100 pb-4 last:border-b-0">
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h4 className="font-medium text-gray-800">{appointment.clientName}</h4>
-                      <p className="text-sm text-gray-600">{appointment.serviceName}</p>
+                      <h4 className="font-medium text-gray-800">{appointment.client_name}</h4>
+                      <p className="text-sm text-gray-600">{appointment.service_name}</p>
                       <p className="text-xs text-gray-500">
-                        {format(new Date(appointment.date), "dd/MM/yyyy", { locale: ptBR })} às {appointment.time}
+                        {appointment.date} às {appointment.time}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium">R$ {appointment.price.toFixed(2)}</p>
+                      <p className="text-sm font-medium">R$ {Number(appointment.price).toFixed(2)}</p>
                       <span className={`text-xs px-2 py-1 rounded-full ${
                         appointment.status === 'completed' ? 'bg-green-100 text-green-800' :
                         appointment.status === 'cancelled' ? 'bg-red-100 text-red-800' :

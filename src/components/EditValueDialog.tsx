@@ -20,7 +20,7 @@ export const EditValueDialog = ({ appointmentId, currentPrice, clientName }: Edi
   const { updateAppointmentPrice } = useApp();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const numericPrice = parseFloat(price);
@@ -33,7 +33,7 @@ export const EditValueDialog = ({ appointmentId, currentPrice, clientName }: Edi
       return;
     }
 
-    updateAppointmentPrice(appointmentId, numericPrice);
+    await updateAppointmentPrice(appointmentId, numericPrice);
     toast({
       title: "Valor Atualizado",
       description: `Valor do atendimento de ${clientName} foi atualizado para R$ ${numericPrice.toFixed(2)}.`,

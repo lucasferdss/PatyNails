@@ -1,15 +1,19 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Service, Appointment } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface AppContextType {
   services: Service[];
   appointments: Appointment[];
-  addService: (service: Omit<Service, 'id'>) => void;
-  deleteService: (id: string) => void;
-  addAppointment: (appointment: Omit<Appointment, 'id' | 'createdAt'>) => void;
-  updateAppointmentStatus: (id: string, status: 'completed' | 'cancelled') => void;
-  updateAppointmentPrice: (id: string, price: number) => void;
+  loading: boolean;
+  addService: (service: Omit<Service, 'id'>) => Promise<void>;
+  deleteService: (id: string) => Promise<void>;
+  addAppointment: (appointment: Omit<Appointment, 'id' | 'createdAt'>) => Promise<void>;
+  updateAppointmentStatus: (id: string, status: 'completed' | 'cancelled') => Promise<void>;
+  updateAppointmentPrice: (id: string, price: number) => Promise<void>;
+  refreshData: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -17,76 +21,234 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [services, setServices] = useState<Service[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  // Load data from localStorage on mount
+  // Carregar serviços do Supabase
+  const loadServices = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .order('name');
+
+      if (error) {
+        console.error('Erro ao carregar serviços:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar os serviços.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setServices(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar serviços:', error);
+    }
+  };
+
+  // Carregar agendamentos do Supabase
+  const loadAppointments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('*')
+        .order('date', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao carregar agendamentos:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar os agendamentos.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setAppointments(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar agendamentos:', error);
+    }
+  };
+
+  // Carregar todos os dados
+  const refreshData = async () => {
+    setLoading(true);
+    await Promise.all([loadServices(), loadAppointments()]);
+    setLoading(false);
+  };
+
+  // Carregar dados na inicialização
   useEffect(() => {
-    const savedServices = localStorage.getItem('patynails-services');
-    const savedAppointments = localStorage.getItem('patynails-appointments');
-    
-    if (savedServices) {
-      setServices(JSON.parse(savedServices));
-    }
-    
-    if (savedAppointments) {
-      setAppointments(JSON.parse(savedAppointments));
-    }
+    refreshData();
   }, []);
 
-  // Save to localStorage whenever data changes
-  useEffect(() => {
-    localStorage.setItem('patynails-services', JSON.stringify(services));
-  }, [services]);
+  const addService = async (service: Omit<Service, 'id'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('services')
+        .insert([service])
+        .select()
+        .single();
 
-  useEffect(() => {
-    localStorage.setItem('patynails-appointments', JSON.stringify(appointments));
-  }, [appointments]);
+      if (error) {
+        console.error('Erro ao adicionar serviço:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível adicionar o serviço.",
+          variant: "destructive",
+        });
+        return;
+      }
 
-  const addService = (service: Omit<Service, 'id'>) => {
-    const newService: Service = {
-      ...service,
-      id: Date.now().toString(),
-    };
-    setServices(prev => [...prev, newService]);
+      setServices(prev => [...prev, data]);
+    } catch (error) {
+      console.error('Erro ao adicionar serviço:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível adicionar o serviço.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const deleteService = (id: string) => {
-    setServices(prev => prev.filter(service => service.id !== id));
+  const deleteService = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('services')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Erro ao excluir serviço:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível excluir o serviço.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setServices(prev => prev.filter(service => service.id !== id));
+    } catch (error) {
+      console.error('Erro ao excluir serviço:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível excluir o serviço.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const addAppointment = (appointment: Omit<Appointment, 'id' | 'createdAt'>) => {
-    const newAppointment: Appointment = {
-      ...appointment,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-    };
-    setAppointments(prev => [...prev, newAppointment]);
+  const addAppointment = async (appointment: Omit<Appointment, 'id' | 'createdAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('appointments')
+        .insert([{
+          ...appointment,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao adicionar agendamento:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível criar o agendamento.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setAppointments(prev => [...prev, data]);
+    } catch (error) {
+      console.error('Erro ao adicionar agendamento:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível criar o agendamento.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const updateAppointmentStatus = (id: string, status: 'completed' | 'cancelled') => {
-    setAppointments(prev => 
-      prev.map(appointment => 
-        appointment.id === id ? { ...appointment, status } : appointment
-      )
-    );
+  const updateAppointmentStatus = async (id: string, status: 'completed' | 'cancelled') => {
+    try {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Erro ao atualizar status do agendamento:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível atualizar o status do agendamento.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setAppointments(prev => 
+        prev.map(appointment => 
+          appointment.id === id ? { ...appointment, status } : appointment
+        )
+      );
+    } catch (error) {
+      console.error('Erro ao atualizar status do agendamento:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o status do agendamento.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const updateAppointmentPrice = (id: string, price: number) => {
-    setAppointments(prev => 
-      prev.map(appointment => 
-        appointment.id === id ? { ...appointment, price } : appointment
-      )
-    );
+  const updateAppointmentPrice = async (id: string, price: number) => {
+    try {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ price })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Erro ao atualizar preço do agendamento:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível atualizar o preço do agendamento.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setAppointments(prev => 
+        prev.map(appointment => 
+          appointment.id === id ? { ...appointment, price } : appointment
+        )
+      );
+    } catch (error) {
+      console.error('Erro ao atualizar preço do agendamento:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o preço do agendamento.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <AppContext.Provider value={{
       services,
       appointments,
+      loading,
       addService,
       deleteService,
       addAppointment,
       updateAppointmentStatus,
       updateAppointmentPrice,
+      refreshData,
     }}>
       {children}
     </AppContext.Provider>

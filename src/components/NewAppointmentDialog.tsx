@@ -51,7 +51,7 @@ export const NewAppointmentDialog = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!clientName || !date || !time || !selectedServiceId) {
@@ -74,12 +74,12 @@ export const NewAppointmentDialog = () => {
     console.log('Horário:', time);
     console.log('Serviço:', selectedService.name);
 
-    addAppointment({
-      clientName,
+    await addAppointment({
+      client_name: clientName,
       date: formattedDate,
       time,
-      serviceId: selectedServiceId,
-      serviceName: selectedService.name,
+      service_id: selectedServiceId,
+      service_name: selectedService.name,
       price: selectedService.price,
       status: 'scheduled',
     });
@@ -166,7 +166,7 @@ export const NewAppointmentDialog = () => {
               <SelectContent>
                 {services.map((service) => (
                   <SelectItem key={service.id} value={service.id}>
-                    {service.name} - R$ {service.price.toFixed(2)}
+                    {service.name} - R$ {Number(service.price).toFixed(2)}
                   </SelectItem>
                 ))}
               </SelectContent>
