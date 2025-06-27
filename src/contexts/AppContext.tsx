@@ -10,7 +10,7 @@ interface AppContextType {
   loading: boolean;
   addService: (service: Omit<Service, 'id'>) => Promise<void>;
   deleteService: (id: string) => Promise<void>;
-  addAppointment: (appointment: Omit<Appointment, 'id' | 'createdAt'>) => Promise<void>;
+  addAppointment: (appointment: Omit<Appointment, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   updateAppointmentStatus: (id: string, status: 'completed' | 'cancelled') => Promise<void>;
   updateAppointmentPrice: (id: string, price: number) => Promise<void>;
   refreshData: () => Promise<void>;
@@ -66,7 +66,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      setAppointments(data || []);
+      // Garantir que o status seja do tipo correto
+      const typedAppointments: Appointment[] = (data || []).map(appointment => ({
+        ...appointment,
+        status: appointment.status as 'scheduled' | 'completed' | 'cancelled'
+      }));
+
+      setAppointments(typedAppointments);
     } catch (error) {
       console.error('Erro ao carregar agendamentos:', error);
     }
@@ -141,7 +147,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const addAppointment = async (appointment: Omit<Appointment, 'id' | 'createdAt'>) => {
+  const addAppointment = async (appointment: Omit<Appointment, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       const { data, error } = await supabase
         .from('appointments')
@@ -163,7 +169,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      setAppointments(prev => [...prev, data]);
+      // Garantir que o status seja do tipo correto
+      const typedAppointment: Appointment = {
+        ...data,
+        status: data.status as 'scheduled' | 'completed' | 'cancelled'
+      };
+
+      setAppointments(prev => [...prev, typedAppointment]);
     } catch (error) {
       console.error('Erro ao adicionar agendamento:', error);
       toast({
