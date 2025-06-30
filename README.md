@@ -6,16 +6,16 @@ Aplicativo desenvolvido para ajudar no gerenciamento de agendamentos, serviços 
 
 ✨ Funcionalidades Principais
 
-📅 Agendamento de clientes com lembretes
-💅 Cadastro de serviços oferecidos no studio
-💰 Controle financeiro de receitas e despesas
-📊 Relatórios de lucros mensais/anuais
-👥 Gerenciamento de clientes com histórico
-🔔 Notificações para compromissos
-🛠 Tecnologias Utilizadas
+- 📅 Agendamento de clientes com lembretes
+- 💅 Cadastro de serviços oferecidos no studio
+- 💰 Controle financeiro de receitas e despesas
+- 📊 Relatórios de lucros mensais/anuais
+- 👥 Gerenciamento de clientes com histórico
+- 🔔 Notificações para compromissos
+- 🛠 Tecnologias Utilizadas
 
-Plataforma: Android
-Backend: lovable.dev
-Linguagem: Kotlin/Java
-Banco de Dados: Firebase/SQLite
-UI/UX: Material Design
+- Plataforma: Android
+- Backend: lovable.dev
+- Linguagem: Kotlin/Java
+- Banco de Dados: Firebase/SQLite
+- UI/UX: Material Design
