@@ -15,7 +15,6 @@ Aplicativo desenvolvido para ajudar no gerenciamento de agendamentos, serviços 
 - 🛠 Tecnologias Utilizadas
 
 - Plataforma: Android
-- Backend: lovable.dev
-- Linguagem: Kotlin/Java
-- Banco de Dados: Firebase/SQLite
+- Linguagem: TypeScript
+- Banco de Dados: Supabase
 - UI/UX: Material Design
