@@ -2,7 +2,7 @@ Studio de Unhas em Gel - Aplicativo de Gestão
 
 📱 Visão Geral
 
-Aplicativo desenvolvido para ajudar no gerenciamento de agendamentos, serviços e controle financeiro de um studio de unhas em gel. Desenvolvido com lovable.dev e Android Studio, oferece uma solução simples e intuitiva para administrar o negócio.
+Aplicativo desenvolvido para ajudar no gerenciamento de agendamentos, serviços e controle financeiro de um studio de unhas em gel. Oferece uma solução simples e intuitiva para administrar o negócio.
 
 ✨ Funcionalidades Principais
 
