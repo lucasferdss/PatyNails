@@ -6,14 +6,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  const { signIn, signUp, user } = useAuth();
+  const {
+    signIn,
+    signUp,
+    user
+  } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already authenticated
@@ -22,37 +24,27 @@ const Auth = () => {
       navigate('/');
     }
   }, [user, navigate]);
-
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     const result = await signIn(email, password);
-    
     if (result.error) {
       setError(result.error);
     }
-    
     setLoading(false);
   };
-
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     const result = await signUp(email, password);
-    
     if (result.error) {
       setError(result.error);
     }
-    
     setLoading(false);
   };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 p-4">
+  return <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 p-4 rounded-none bg-violet-200">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">PatyNails</CardTitle>
@@ -72,33 +64,17 @@ const Auth = () => {
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">Email</Label>
-                  <Input
-                    id="signin-email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+                  <Input id="signin-email" type="email" placeholder="seu@email.com" value={email} onChange={e => setEmail(e.target.value)} required />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="signin-password">Senha</Label>
-                  <Input
-                    id="signin-password"
-                    type="password"
-                    placeholder="Sua senha"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <Input id="signin-password" type="password" placeholder="Sua senha" value={password} onChange={e => setPassword(e.target.value)} required />
                 </div>
                 
-                {error && (
-                  <div className="text-sm text-destructive">
+                {error && <div className="text-sm text-destructive">
                     {error}
-                  </div>
-                )}
+                  </div>}
                 
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Entrando...' : 'Entrar'}
@@ -110,34 +86,17 @@ const Auth = () => {
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+                  <Input id="signup-email" type="email" placeholder="seu@email.com" value={email} onChange={e => setEmail(e.target.value)} required />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Senha</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="Mínimo 6 caracteres"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={6}
-                  />
+                  <Input id="signup-password" type="password" placeholder="Mínimo 6 caracteres" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
                 </div>
                 
-                {error && (
-                  <div className="text-sm text-destructive">
+                {error && <div className="text-sm text-destructive">
                     {error}
-                  </div>
-                )}
+                  </div>}
                 
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Criando conta...' : 'Criar conta'}
@@ -147,8 +106,6 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };
-
 export default Auth;
