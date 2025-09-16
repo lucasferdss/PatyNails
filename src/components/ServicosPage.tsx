@@ -1,14 +1,16 @@
 
-import { Trash2 } from 'lucide-react';
+import { Trash2, LogOut } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { NewServiceDialog } from './NewServiceDialog';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingSpinner } from './LoadingSpinner';
 
 const ServicosPage = () => {
   const { services, deleteService, loading } = useApp();
+  const { signOut, user } = useAuth();
   const { toast } = useToast();
 
   const handleDeleteService = async (serviceId: string, serviceName: string) => {
@@ -43,8 +45,22 @@ const ServicosPage = () => {
   return (
     <div className="p-4 pb-20 max-w-md mx-auto animate-fade-in">
       {/* Header */}
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-primary-600">Serviços</h1>
+      <div className="flex justify-between items-center mb-6">
+        <div className="text-center flex-1">
+          <h1 className="text-2xl font-bold text-primary-600">Serviços</h1>
+          {user && (
+            <p className="text-sm text-gray-500 mt-1">{user.email}</p>
+          )}
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={signOut}
+          className="text-red-600 border-red-600 hover:bg-red-50"
+        >
+          <LogOut size={16} className="mr-1" />
+          Sair
+        </Button>
       </div>
 
       {/* Manage Services Section */}
