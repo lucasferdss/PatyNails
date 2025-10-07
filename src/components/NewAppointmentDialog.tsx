@@ -13,6 +13,14 @@ import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { useApp } from '@/contexts/AppContext';
 import { useToast } from '@/hooks/use-toast';
+import { z } from 'zod';
+
+const appointmentSchema = z.object({
+  client_name: z.string().trim().min(1, "Nome do cliente é obrigatório").max(100, "Nome deve ter no máximo 100 caracteres"),
+  date: z.date({ required_error: "Data é obrigatória" }),
+  time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Horário inválido"),
+  service_id: z.string().uuid("Selecione um serviço válido"),
+});
 
 export const NewAppointmentDialog = () => {
   const [open, setOpen] = useState(false);
@@ -25,26 +33,18 @@ export const NewAppointmentDialog = () => {
   const { toast } = useToast();
 
   const formatDateForStorage = (date: Date) => {
-    // Criar uma nova data para evitar problemas de timezone
     const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
     const day = String(localDate.getDate()).padStart(2, '0');
     const month = String(localDate.getMonth() + 1).padStart(2, '0');
     const year = localDate.getFullYear();
     
-    console.log('Data original:', date);
-    console.log('Data local ajustada:', localDate);
-    console.log('Data formatada para storage:', `${day}/${month}/${year}`);
-    
     return `${day}/${month}/${year}`;
   };
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
-    console.log('Data selecionada no calendário:', selectedDate);
     if (selectedDate) {
-      // Garantir que estamos trabalhando com o meio-dia para evitar problemas de timezone
       const adjustedDate = new Date(selectedDate);
       adjustedDate.setHours(12, 0, 0, 0);
-      console.log('Data ajustada:', adjustedDate);
       setDate(adjustedDate);
     } else {
       setDate(undefined);
@@ -54,10 +54,19 @@ export const NewAppointmentDialog = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!clientName || !date || !time || !selectedServiceId) {
+    // Validate using Zod schema
+    const validation = appointmentSchema.safeParse({
+      client_name: clientName,
+      date: date,
+      time: time,
+      service_id: selectedServiceId,
+    });
+
+    if (!validation.success) {
+      const errorMessage = validation.error.errors[0]?.message || "Dados inválidos";
       toast({
-        title: "Erro",
-        description: "Por favor, preencha todos os campos.",
+        title: "Erro de Validação",
+        description: errorMessage,
         variant: "destructive",
       });
       return;
@@ -66,19 +75,13 @@ export const NewAppointmentDialog = () => {
     const selectedService = services.find(s => s.id === selectedServiceId);
     if (!selectedService) return;
 
-    const formattedDate = formatDateForStorage(date);
-    
-    console.log('Dados do agendamento:');
-    console.log('Cliente:', clientName);
-    console.log('Data formatada:', formattedDate);
-    console.log('Horário:', time);
-    console.log('Serviço:', selectedService.name);
+    const formattedDate = formatDateForStorage(validation.data.date);
 
     await addAppointment({
-      client_name: clientName,
+      client_name: validation.data.client_name,
       date: formattedDate,
-      time,
-      service_id: selectedServiceId,
+      time: validation.data.time,
+      service_id: validation.data.service_id,
       service_name: selectedService.name,
       price: selectedService.price,
       status: 'scheduled',

@@ -7,6 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Plus } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { useToast } from '@/hooks/use-toast';
+import { z } from 'zod';
+
+const serviceSchema = z.object({
+  name: z.string().trim().min(1, "Nome é obrigatório").max(100, "Nome deve ter no máximo 100 caracteres"),
+  price: z.number().min(0.01, "Preço deve ser maior que zero").max(100000, "Preço deve ser menor que 100.000"),
+});
 
 export const NewServiceDialog = () => {
   const [open, setOpen] = useState(false);
@@ -19,28 +25,27 @@ export const NewServiceDialog = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!serviceName || !price) {
-      toast({
-        title: "Erro",
-        description: "Por favor, preencha todos os campos.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     const priceNumber = parseFloat(price);
-    if (isNaN(priceNumber) || priceNumber <= 0) {
+    
+    // Validate using Zod schema
+    const validation = serviceSchema.safeParse({
+      name: serviceName,
+      price: priceNumber,
+    });
+
+    if (!validation.success) {
+      const errorMessage = validation.error.errors[0]?.message || "Dados inválidos";
       toast({
-        title: "Erro",
-        description: "Por favor, insira um preço válido.",
+        title: "Erro de Validação",
+        description: errorMessage,
         variant: "destructive",
       });
       return;
     }
 
     await addService({
-      name: serviceName,
-      price: priceNumber,
+      name: validation.data.name,
+      price: validation.data.price,
     });
 
     toast({

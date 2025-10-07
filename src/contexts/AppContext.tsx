@@ -120,9 +120,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteService = async (id: string): Promise<{ success: boolean; message: string }> => {
     try {
-      console.log('Tentando excluir serviço:', id);
-      
-      // Primeiro, verificar se há agendamentos associados a este serviço
+      // Verificar se há agendamentos associados a este serviço
       const { data: appointmentsData, error: appointmentsError } = await supabase
         .from('appointments')
         .select('id')
@@ -137,7 +135,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (appointmentsData && appointmentsData.length > 0) {
-        console.log('Serviço possui agendamentos associados:', appointmentsData.length);
         return {
           success: false,
           message: `Não é possível excluir este serviço pois existem ${appointmentsData.length} agendamento(s) associado(s) a ele.`
@@ -158,7 +155,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         };
       }
 
-      console.log('Serviço excluído com sucesso');
       setServices(prev => prev.filter(service => service.id !== id));
       return {
         success: true,

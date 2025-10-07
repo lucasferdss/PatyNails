@@ -15,8 +15,6 @@ const ServicosPage = () => {
 
   const handleDeleteService = async (serviceId: string, serviceName: string) => {
     if (confirm(`Tem certeza que deseja excluir o serviço "${serviceName}"?`)) {
-      console.log('Iniciando exclusão do serviço:', serviceId);
-      
       const result = await deleteService(serviceId);
       
       if (result.success) {

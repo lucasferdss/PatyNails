@@ -31,13 +31,8 @@ const AgendaPage = () => {
   };
 
   const getAppointmentsForDate = (date: Date) => {
-    console.log('Buscando agendamentos para:', date);
-    console.log('Agendamentos disponíveis:', appointments);
-    
     return appointments.filter(appointment => {
       const appointmentDate = parseDateFromStorage(appointment.date);
-      console.log('Comparando:', appointmentDate, 'com', date);
-      console.log('É o mesmo dia?', isSameDay(appointmentDate, date));
       return isSameDay(appointmentDate, date) && appointment.status === 'scheduled';
     });
   };

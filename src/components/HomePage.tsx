@@ -10,41 +10,22 @@ const HomePage = () => {
   const { appointments, loading } = useApp();
 
   const parseDateFromStorage = (dateString: string): Date => {
-    console.log('Parsing date from storage:', dateString);
-    // Se a data está no formato dd/mm/yyyy
     if (dateString.includes('/')) {
       const [day, month, year] = dateString.split('/');
-      const parsedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      console.log('Parsed dd/mm/yyyy date:', parsedDate);
-      return parsedDate;
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     }
-    // Se a data está no formato antigo yyyy-mm-dd
-    const parsedDate = new Date(dateString);
-    console.log('Parsed yyyy-mm-dd date:', parsedDate);
-    return parsedDate;
+    return new Date(dateString);
   };
-
-  console.log('All appointments:', appointments);
-  console.log('Today:', new Date());
 
   const todayAppointments = appointments.filter(appointment => {
     const appointmentDate = parseDateFromStorage(appointment.date);
-    const isTodayCheck = isToday(appointmentDate);
-    const isScheduled = appointment.status === 'scheduled';
-    console.log(`Appointment ${appointment.id}: date=${appointment.date}, parsed=${appointmentDate}, isToday=${isTodayCheck}, status=${appointment.status}, isScheduled=${isScheduled}`);
-    return isTodayCheck && isScheduled;
+    return isToday(appointmentDate) && appointment.status === 'scheduled';
   });
 
   const tomorrowAppointments = appointments.filter(appointment => {
     const appointmentDate = parseDateFromStorage(appointment.date);
-    const isTomorrowCheck = isTomorrow(appointmentDate);
-    const isScheduled = appointment.status === 'scheduled';
-    console.log(`Appointment ${appointment.id}: date=${appointment.date}, parsed=${appointmentDate}, isTomorrow=${isTomorrowCheck}, status=${appointment.status}, isScheduled=${isScheduled}`);
-    return isTomorrowCheck && isScheduled;
+    return isTomorrow(appointmentDate) && appointment.status === 'scheduled';
   });
-
-  console.log('Today appointments:', todayAppointments);
-  console.log('Tomorrow appointments:', tomorrowAppointments);
 
   const renderAppointments = (appointmentsList: typeof appointments) => {
     if (loading) {
