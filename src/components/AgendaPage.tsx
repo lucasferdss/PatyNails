@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Calendar as CalendarIcon, Check, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -82,7 +81,7 @@ const AgendaPage = () => {
   }
 
   return (
-    <div className="p-4 pb-20 max-w-md mx-auto animate-fade-in">
+    <div className="px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-20 max-w-md mx-auto animate-fade-in">
       {/* Header */}
       <Card className="mb-6 bg-primary-500 text-white border-0">
         <CardHeader className="pb-3">

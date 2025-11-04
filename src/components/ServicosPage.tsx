@@ -40,7 +40,7 @@ const ServicosPage = () => {
   }
 
   return (
-    <div className="p-4 pb-20 max-w-md mx-auto animate-fade-in">
+    <div className="px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-20 max-w-md mx-auto animate-fade-in">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div className="text-center flex-1">
