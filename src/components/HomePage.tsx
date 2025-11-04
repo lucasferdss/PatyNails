@@ -1,4 +1,3 @@
-
 import { Calendar, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useApp } from '@/contexts/AppContext';
@@ -61,7 +60,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="p-4 pb-20 max-w-md mx-auto animate-fade-in">
+    <div className="px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-20 max-w-md mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-primary-600 mb-2">PatyNails</h1>

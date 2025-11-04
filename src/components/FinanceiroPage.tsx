@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -71,7 +70,7 @@ const FinanceiroPage = () => {
   }
 
   return (
-    <div className="p-4 pb-20 max-w-md mx-auto animate-fade-in">
+    <div className="px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-20 max-w-md mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-primary-600">Financeiro</h1>
