@@ -1,6 +1,5 @@
-
 import { Trash2, LogOut } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -72,48 +71,37 @@ const ServicosPage = () => {
         </div>
       </div>
 
-      {/* Services Table Header */}
-      <div className="bg-gray-50 rounded-lg p-4 mb-4">
-        <div className="grid grid-cols-3 gap-4 text-sm font-medium text-gray-600">
-          <div>Serviço</div>
-          <div className="text-center">Preço (R$)</div>
-          <div className="text-center">Ações</div>
-        </div>
-      </div>
-
       {/* Services List */}
-      <Card>
-        <CardContent className="p-6">
-          {services.length === 0 ? (
+      {services.length === 0 ? (
+        <Card>
+          <CardContent className="p-6">
             <div className="text-center py-8">
               <p className="text-gray-500">Nenhum serviço cadastrado</p>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {services.map((service) => (
-                <div key={service.id} className="grid grid-cols-3 gap-4 items-center py-3 border-b border-gray-100 last:border-b-0">
-                  <div>
-                    <h4 className="font-medium text-gray-800">{service.name}</h4>
-                  </div>
-                  <div className="text-center">
-                    <span className="text-gray-700">R$ {Number(service.price).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-center">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDeleteService(service.id, service.name)}
-                      className="text-red-600 border-red-600 hover:bg-red-50"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {services.map((service) => (
+            <Card key={service.id}>
+              <CardContent className="p-4 flex justify-between items-center">
+                <div>
+                  <h4 className="font-medium text-gray-800">{service.name}</h4>
+                  <p className="text-sm text-gray-600">R$ {Number(service.price).toFixed(2)}</p>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleDeleteService(service.id, service.name)}
+                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                >
+                  <Trash2 size={20} />
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

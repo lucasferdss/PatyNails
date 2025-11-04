@@ -21,8 +21,8 @@ export default defineConfig(({ mode }) => ({
         name: 'PatyNails - Gestão de Salão',
         short_name: 'PatyNails',
         description: 'Sistema de gestão completo para salão de beleza',
-        theme_color: '#ec4899',
-        background_color: '#ffffff',
+        theme_color: '#8B5CF6',
+        background_color: '#F3F0FF',
         display: 'standalone',
         scope: '/',
         start_url: '/',
@@ -32,19 +32,13 @@ export default defineConfig(({ mode }) => ({
             src: 'pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
-            purpose: 'any'
+            purpose: 'any maskable'
           },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable'
+            purpose: 'any maskable'
           }
         ]
       },
