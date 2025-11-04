@@ -9,6 +9,7 @@ import FinanceiroPage from '@/components/FinanceiroPage';
 import ServicosPage from '@/components/ServicosPage';
 import { AppProvider } from '@/contexts/AppContext';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { InstallPWA } from '@/components/InstallPWA';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('inicio');
@@ -58,6 +59,9 @@ const Index = () => {
         <div className="min-h-screen">
           {renderContent()}
         </div>
+        
+        {/* Install PWA Banner */}
+        <InstallPWA />
         
         {/* Bottom Navigation */}
         <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
