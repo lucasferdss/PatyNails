@@ -27,11 +27,9 @@ export const NewAppointmentDialog = () => {
   const [clientName, setClientName] = useState('');
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState('');
-  const [selectedServiceId, setSelectedServiceId] = useState('');
-  
+  const [selectedServiceId, setSelectedServiceId] = useState('');  
   const { services, addAppointment } = useApp();
   const { toast } = useToast();
-
   const formatDateForStorage = (date: Date) => {
     const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
     const day = String(localDate.getDate()).padStart(2, '0');
@@ -53,8 +51,7 @@ export const NewAppointmentDialog = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate using Zod schema
+
     const validation = appointmentSchema.safeParse({
       client_name: clientName,
       date: date,
@@ -92,7 +89,6 @@ export const NewAppointmentDialog = () => {
       description: "Agendamento criado com sucesso!",
     });
 
-    // Reset form
     setClientName('');
     setDate(undefined);
     setTime('');
@@ -121,8 +117,7 @@ export const NewAppointmentDialog = () => {
               onChange={(e) => setClientName(e.target.value)}
               placeholder="Digite o nome do cliente"
             />
-          </div>
-          
+          </div>        
           <div>
             <Label>Data</Label>
             <Popover>
@@ -149,7 +144,6 @@ export const NewAppointmentDialog = () => {
               </PopoverContent>
             </Popover>
           </div>
-
           <div>
             <Label htmlFor="time">Horário</Label>
             <Input
@@ -159,7 +153,6 @@ export const NewAppointmentDialog = () => {
               onChange={(e) => setTime(e.target.value)}
             />
           </div>
-
           <div>
             <Label>Serviço</Label>
             <Select value={selectedServiceId} onValueChange={setSelectedServiceId}>
@@ -175,7 +168,6 @@ export const NewAppointmentDialog = () => {
               </SelectContent>
             </Select>
           </div>
-
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar

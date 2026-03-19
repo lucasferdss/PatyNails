@@ -61,18 +61,13 @@ const HomePage = () => {
 
   return (
     <div className="px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-20 max-w-md mx-auto animate-fade-in">
-      {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-primary-600 mb-2">PatyNails</h1>
       </div>
-
-      {/* Welcome Section */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-2">Bem-vinda!</h2>
         <p className="text-gray-600">Gerencie seus agendamentos facilmente.</p>
       </div>
-
-      {/* Today's Appointments */}
       <Card className="mb-6 border-primary-100 bg-primary-50/50">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg text-primary-700 flex items-center gap-2">
@@ -84,8 +79,6 @@ const HomePage = () => {
           {renderAppointments(todayAppointments)}
         </CardContent>
       </Card>
-
-      {/* Tomorrow's Appointments */}
       <Card className="mb-6 border-primary-100 bg-primary-50/30">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg text-primary-700 flex items-center gap-2">

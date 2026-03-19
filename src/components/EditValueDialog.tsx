@@ -63,8 +63,7 @@ export const EditValueDialog = ({ appointmentId, currentPrice, clientName }: Edi
               disabled
               className="bg-gray-100"
             />
-          </div>
-          
+          </div>   
           <div>
             <Label htmlFor="price">Valor (R$)</Label>
             <Input
@@ -77,7 +76,6 @@ export const EditValueDialog = ({ appointmentId, currentPrice, clientName }: Edi
               placeholder="0,00"
             />
           </div>
-
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar

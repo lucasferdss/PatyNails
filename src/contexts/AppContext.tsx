@@ -22,8 +22,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-
-  // Carregar serviços do Supabase
   const loadServices = async () => {
     try {
       const { data, error } = await supabase
@@ -47,7 +45,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Carregar agendamentos do Supabase
   const loadAppointments = async () => {
     try {
       const { data, error } = await supabase
@@ -65,7 +62,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      // Garantir que o status seja do tipo correto
       const typedAppointments: Appointment[] = (data || []).map(appointment => ({
         ...appointment,
         status: appointment.status as 'scheduled' | 'completed' | 'cancelled'
@@ -77,14 +73,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Carregar todos os dados
   const refreshData = async () => {
     setLoading(true);
     await Promise.all([loadServices(), loadAppointments()]);
     setLoading(false);
   };
 
-  // Carregar dados na inicialização
   useEffect(() => {
     refreshData();
   }, []);
@@ -120,7 +114,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteService = async (id: string): Promise<{ success: boolean; message: string }> => {
     try {
-      // Verificar se há agendamentos associados a este serviço
       const { data: appointmentsData, error: appointmentsError } = await supabase
         .from('appointments')
         .select('id')
@@ -141,7 +134,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         };
       }
 
-      // Se não há agendamentos, proceder com a exclusão
       const { error } = await supabase
         .from('services')
         .delete()
@@ -191,7 +183,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      // Garantir que o status seja do tipo correto
       const typedAppointment: Appointment = {
         ...data,
         status: data.status as 'scheduled' | 'completed' | 'cancelled'

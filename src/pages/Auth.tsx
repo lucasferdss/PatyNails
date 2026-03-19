@@ -19,7 +19,6 @@ const Auth = () => {
   } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (user) {
       navigate('/');

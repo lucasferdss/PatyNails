@@ -16,14 +16,12 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect to auth if not authenticated
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
 
-  // Show loading while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -32,7 +30,6 @@ const Index = () => {
     );
   }
 
-  // Don't render content if not authenticated
   if (!user) {
     return null;
   }
@@ -55,15 +52,10 @@ const Index = () => {
   return (
     <AppProvider>
       <div className="min-h-screen bg-gray-50">
-        {/* Main Content */}
         <div className="min-h-screen">
           {renderContent()}
         </div>
-        
-        {/* Install PWA Banner */}
         <InstallPWA />
-        
-        {/* Bottom Navigation */}
         <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
     </AppProvider>

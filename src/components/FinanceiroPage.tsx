@@ -9,20 +9,16 @@ import { LoadingSpinner } from './LoadingSpinner';
 const FinanceiroPage = () => {
   const [activeTab, setActiveTab] = useState('semana');
   const { appointments, updateAppointmentStatus, loading } = useApp();
-
   const now = new Date();
   const weekStart = startOfWeek(now, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
   const monthStart = startOfMonth(now);
   const monthEnd = endOfMonth(now);
-
   const parseDateFromStorage = (dateString: string): Date => {
-    // Se a data está no formato dd/mm/yyyy
     if (dateString.includes('/')) {
       const [day, month, year] = dateString.split('/');
       return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     }
-    // Se a data está no formato antigo yyyy-mm-dd
     return new Date(dateString);
   };
 
@@ -71,12 +67,9 @@ const FinanceiroPage = () => {
 
   return (
     <div className="px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-20 max-w-md mx-auto animate-fade-in">
-      {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-primary-600">Financeiro</h1>
       </div>
-
-      {/* Revenue Cards */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Card className="bg-orange-100 border-orange-200">
           <CardContent className="p-4">
@@ -91,8 +84,6 @@ const FinanceiroPage = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Tab Navigation */}
       <div className="flex justify-center mb-4">
         <div className="flex bg-gray-100 rounded-lg p-1">
           <button
@@ -117,13 +108,9 @@ const FinanceiroPage = () => {
           </button>
         </div>
       </div>
-
-      {/* Period Info */}
       <div className="text-center mb-6">
         <p className="text-gray-600 text-sm">Período: {formatPeriod()}</p>
       </div>
-
-      {/* Services History */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg text-primary-700">Histórico de serviços</CardTitle>

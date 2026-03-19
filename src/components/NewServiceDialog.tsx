@@ -17,17 +17,13 @@ const serviceSchema = z.object({
 export const NewServiceDialog = () => {
   const [open, setOpen] = useState(false);
   const [serviceName, setServiceName] = useState('');
-  const [price, setPrice] = useState('');
-  
+  const [price, setPrice] = useState('');  
   const { addService } = useApp();
   const { toast } = useToast();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const priceNumber = parseFloat(price);
-    
-    // Validate using Zod schema
     const validation = serviceSchema.safeParse({
       name: serviceName,
       price: priceNumber,
@@ -53,7 +49,6 @@ export const NewServiceDialog = () => {
       description: "Serviço criado com sucesso!",
     });
 
-    // Reset form
     setServiceName('');
     setPrice('');
     setOpen(false);
@@ -80,8 +75,7 @@ export const NewServiceDialog = () => {
               onChange={(e) => setServiceName(e.target.value)}
               placeholder="Digite o nome do serviço"
             />
-          </div>
-          
+          </div>          
           <div>
             <Label htmlFor="price">Preço (R$)</Label>
             <Input
@@ -94,7 +88,6 @@ export const NewServiceDialog = () => {
               placeholder="0,00"
             />
           </div>
-
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar

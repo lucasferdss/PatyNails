@@ -16,8 +16,7 @@ export const InstallPWA = () => {
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      
-      // Check if user hasn't dismissed the banner before
+
       const dismissed = localStorage.getItem('pwa-install-dismissed');
       if (!dismissed) {
         setShowInstallBanner(true);
@@ -26,7 +25,6 @@ export const InstallPWA = () => {
 
     window.addEventListener('beforeinstallprompt', handler);
 
-    // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setShowInstallBanner(false);
     }
@@ -61,14 +59,12 @@ export const InstallPWA = () => {
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
           <Download className="w-5 h-5 text-primary" />
-        </div>
-        
+        </div>       
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-sm mb-1">Instalar PatyNails</h3>
           <p className="text-xs text-muted-foreground mb-3">
             Instale o app para acesso rápido e use mesmo offline
-          </p>
-          
+          </p>         
           <div className="flex gap-2">
             <Button 
               onClick={handleInstallClick}
@@ -86,7 +82,6 @@ export const InstallPWA = () => {
             </Button>
           </div>
         </div>
-
         <Button
           onClick={handleDismiss}
           size="icon"

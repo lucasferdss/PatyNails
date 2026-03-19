@@ -20,12 +20,12 @@ const AgendaPage = () => {
   };
 
   const parseDateFromStorage = (dateString: string): Date => {
-    // Se a data está no formato dd/mm/yyyy
+
     if (dateString.includes('/')) {
       const [day, month, year] = dateString.split('/');
       return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     }
-    // Se a data está no formato antigo yyyy-mm-dd
+
     return new Date(dateString);
   };
 
@@ -38,7 +38,6 @@ const AgendaPage = () => {
 
   const selectedDateAppointments = getAppointmentsForDate(selectedDate);
 
-  // Get dates that have appointments for highlighting
   const appointmentDates = appointments
     .filter(apt => apt.status === 'scheduled')
     .map(apt => parseDateFromStorage(apt.date));
@@ -82,7 +81,6 @@ const AgendaPage = () => {
 
   return (
     <div className="px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-20 max-w-md mx-auto animate-fade-in">
-      {/* Header */}
       <Card className="mb-6 bg-primary-500 text-white border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-xl flex items-center gap-2">
@@ -96,8 +94,6 @@ const AgendaPage = () => {
           </div>
         </CardHeader>
       </Card>
-
-      {/* Calendar */}
       <Card className="mb-6">
         <CardContent className="p-4">
           <Calendar
@@ -111,20 +107,14 @@ const AgendaPage = () => {
           />
         </CardContent>
       </Card>
-
-      {/* Selected Date */}
       <div className="mb-4">
         <h3 className="text-lg font-medium text-gray-800 capitalize">
           {formatSelectedDate()}
         </h3>
       </div>
-
-      {/* New Appointment Button */}
       <div className="mb-6 flex justify-end">
         <NewAppointmentDialog />
       </div>
-
-      {/* Appointments List */}
       <Card>
         <CardContent className="p-6">
           {selectedDateAppointments.length === 0 ? (
@@ -145,8 +135,6 @@ const AgendaPage = () => {
                       <p className="text-sm text-gray-600">R$ {Number(appointment.price).toFixed(2)}</p>
                     </div>
                   </div>
-                  
-                  {/* Action Buttons */}
                   <div className="flex gap-2 mt-3">
                     <Button
                       size="sm"

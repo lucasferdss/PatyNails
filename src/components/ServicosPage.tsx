@@ -41,7 +41,6 @@ const ServicosPage = () => {
 
   return (
     <div className="px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-20 max-w-md mx-auto animate-fade-in">
-      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div className="text-center flex-1">
           <h1 className="text-2xl font-bold text-primary-600">Serviços</h1>
@@ -59,19 +58,13 @@ const ServicosPage = () => {
           Sair
         </Button>
       </div>
-
-      {/* Manage Services Section */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-primary-700 mb-2">Gerenciar Serviços</h2>
         <p className="text-gray-600 mb-4">Adicione, edite e remova os serviços oferecidos.</p>
-        
-        {/* New Service Button */}
         <div className="flex justify-end mb-4">
           <NewServiceDialog />
         </div>
       </div>
-
-      {/* Services List */}
       {services.length === 0 ? (
         <Card>
           <CardContent className="p-6">
