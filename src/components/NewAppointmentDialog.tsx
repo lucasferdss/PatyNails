@@ -19,7 +19,7 @@ const appointmentSchema = z.object({
   client_name: z.string().trim().min(1, "Nome do cliente é obrigatório").max(100, "Nome deve ter no máximo 100 caracteres"),
   date: z.date({ required_error: "Data é obrigatória" }),
   time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Horário inválido"),
-  service_id: z.string().uuid("Selecione um serviço válido"),
+  service_id: z.string().min(1, "Selecione um serviço válido"),
 });
 
 export const NewAppointmentDialog = () => {
