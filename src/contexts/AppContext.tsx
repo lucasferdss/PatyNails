@@ -1,6 +1,17 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState, ReactNode } from 'react';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
+import { db } from '@/integrations/firebase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Service, Appointment } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface AppContextType {
@@ -21,87 +32,98 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [services, setServices] = useState<Service[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
   const { toast } = useToast();
-  const loadServices = async () => {
+
+  const loadServices = useCallback(async () => {
+    if (!user) {
+      setServices([]);
+      return;
+    }
+
     try {
-      const { data, error } = await supabase
-        .from('services')
-        .select('*')
-        .order('name');
+      const servicesQuery = query(
+        collection(db, 'services'),
+        where('user_id', '==', user.uid)
+      );
+      const snapshot = await getDocs(servicesQuery);
+      const loadedServices = snapshot.docs.map((serviceDoc) => ({
+        id: serviceDoc.id,
+        ...serviceDoc.data(),
+      })) as Service[];
 
-      if (error) {
-        console.error('Erro ao carregar serviços:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível carregar os serviços.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setServices(data || []);
+      setServices(loadedServices.sort((a, b) => a.name.localeCompare(b.name)));
     } catch (error) {
       console.error('Erro ao carregar serviços:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar os serviços.",
+        variant: "destructive",
+      });
     }
-  };
+  }, [toast, user]);
 
-  const loadAppointments = async () => {
+  const loadAppointments = useCallback(async () => {
+    if (!user) {
+      setAppointments([]);
+      return;
+    }
+
     try {
-      const { data, error } = await supabase
-        .from('appointments')
-        .select('*')
-        .order('date', { ascending: true });
+      const appointmentsQuery = query(
+        collection(db, 'appointments'),
+        where('user_id', '==', user.uid)
+      );
+      const snapshot = await getDocs(appointmentsQuery);
+      const loadedAppointments = snapshot.docs.map((appointmentDoc) => {
+        const data = appointmentDoc.data();
 
-      if (error) {
-        console.error('Erro ao carregar agendamentos:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível carregar os agendamentos.",
-          variant: "destructive",
-        });
-        return;
-      }
+        return {
+          id: appointmentDoc.id,
+          ...data,
+          status: data.status as 'scheduled' | 'completed' | 'cancelled',
+        };
+      }) as Appointment[];
 
-      const typedAppointments: Appointment[] = (data || []).map(appointment => ({
-        ...appointment,
-        status: appointment.status as 'scheduled' | 'completed' | 'cancelled'
-      }));
-
-      setAppointments(typedAppointments);
+      setAppointments(loadedAppointments.sort((a, b) => a.date.localeCompare(b.date)));
     } catch (error) {
       console.error('Erro ao carregar agendamentos:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar os agendamentos.",
+        variant: "destructive",
+      });
     }
-  };
+  }, [toast, user]);
 
-  const refreshData = async () => {
+  const refreshData = useCallback(async () => {
     setLoading(true);
     await Promise.all([loadServices(), loadAppointments()]);
     setLoading(false);
-  };
+  }, [loadAppointments, loadServices]);
 
   useEffect(() => {
-    refreshData();
-  }, []);
+    if (user) {
+      refreshData();
+    } else {
+      setServices([]);
+      setAppointments([]);
+      setLoading(false);
+    }
+  }, [refreshData, user]);
 
   const addService = async (service: Omit<Service, 'id'>) => {
+    if (!user) return;
+
     try {
-      const { data, error } = await supabase
-        .from('services')
-        .insert([service])
-        .select()
-        .single();
+      const serviceData = {
+        ...service,
+        user_id: user.uid,
+        created_at: new Date().toISOString(),
+      };
+      const serviceRef = await addDoc(collection(db, 'services'), serviceData);
 
-      if (error) {
-        console.error('Erro ao adicionar serviço:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível adicionar o serviço.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setServices(prev => [...prev, data]);
+      setServices(prev => [...prev, { id: serviceRef.id, ...service }]);
     } catch (error) {
       console.error('Erro ao adicionar serviço:', error);
       toast({
@@ -113,79 +135,62 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const deleteService = async (id: string): Promise<{ success: boolean; message: string }> => {
+    if (!user) {
+      return {
+        success: false,
+        message: "Usuário não autenticado.",
+      };
+    }
+
     try {
-      const { data: appointmentsData, error: appointmentsError } = await supabase
-        .from('appointments')
-        .select('id')
-        .eq('service_id', id);
+      const appointmentsQuery = query(
+        collection(db, 'appointments'),
+        where('user_id', '==', user.uid),
+        where('service_id', '==', id)
+      );
+      const appointmentsSnapshot = await getDocs(appointmentsQuery);
 
-      if (appointmentsError) {
-        console.error('Erro ao verificar agendamentos:', appointmentsError);
+      if (!appointmentsSnapshot.empty) {
         return {
           success: false,
-          message: "Erro ao verificar agendamentos associados."
+          message: `Não é possível excluir este serviço pois existem ${appointmentsSnapshot.size} agendamento(s) associado(s) a ele.`,
         };
       }
 
-      if (appointmentsData && appointmentsData.length > 0) {
-        return {
-          success: false,
-          message: `Não é possível excluir este serviço pois existem ${appointmentsData.length} agendamento(s) associado(s) a ele.`
-        };
-      }
-
-      const { error } = await supabase
-        .from('services')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Erro ao excluir serviço:', error);
-        return {
-          success: false,
-          message: "Não foi possível excluir o serviço."
-        };
-      }
+      await deleteDoc(doc(db, 'services', id));
 
       setServices(prev => prev.filter(service => service.id !== id));
       return {
         success: true,
-        message: "Serviço excluído com sucesso!"
+        message: "Serviço excluído com sucesso!",
       };
     } catch (error) {
       console.error('Erro ao excluir serviço:', error);
       return {
         success: false,
-        message: "Erro inesperado ao excluir o serviço."
+        message: "Erro inesperado ao excluir o serviço.",
       };
     }
   };
 
   const addAppointment = async (appointment: Omit<Appointment, 'id' | 'created_at' | 'updated_at'>) => {
-    try {
-      const { data, error } = await supabase
-        .from('appointments')
-        .insert([{
-          ...appointment,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
-        .select()
-        .single();
+    if (!user) return;
 
-      if (error) {
-        console.error('Erro ao adicionar agendamento:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível criar o agendamento.",
-          variant: "destructive",
-        });
-        return;
-      }
+    try {
+      const created_at = new Date().toISOString();
+      const appointmentData = {
+        ...appointment,
+        user_id: user.uid,
+        created_at,
+        updated_at: created_at,
+      };
+      const appointmentRef = await addDoc(collection(db, 'appointments'), appointmentData);
 
       const typedAppointment: Appointment = {
-        ...data,
-        status: data.status as 'scheduled' | 'completed' | 'cancelled'
+        id: appointmentRef.id,
+        ...appointment,
+        created_at,
+        updated_at: created_at,
       };
 
       setAppointments(prev => [...prev, typedAppointment]);
@@ -201,23 +206,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const updateAppointmentStatus = async (id: string, status: 'completed' | 'cancelled') => {
     try {
-      const { error } = await supabase
-        .from('appointments')
-        .update({ status })
-        .eq('id', id);
+      await updateDoc(doc(db, 'appointments', id), {
+        status,
+        updated_at: new Date().toISOString(),
+      });
 
-      if (error) {
-        console.error('Erro ao atualizar status do agendamento:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível atualizar o status do agendamento.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setAppointments(prev => 
-        prev.map(appointment => 
+      setAppointments(prev =>
+        prev.map(appointment =>
           appointment.id === id ? { ...appointment, status } : appointment
         )
       );
@@ -233,23 +228,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const updateAppointmentPrice = async (id: string, price: number) => {
     try {
-      const { error } = await supabase
-        .from('appointments')
-        .update({ price })
-        .eq('id', id);
+      await updateDoc(doc(db, 'appointments', id), {
+        price,
+        updated_at: new Date().toISOString(),
+      });
 
-      if (error) {
-        console.error('Erro ao atualizar preço do agendamento:', error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível atualizar o preço do agendamento.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setAppointments(prev => 
-        prev.map(appointment => 
+      setAppointments(prev =>
+        prev.map(appointment =>
           appointment.id === id ? { ...appointment, price } : appointment
         )
       );

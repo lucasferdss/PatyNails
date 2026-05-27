@@ -16,5 +16,5 @@ Aplicativo desenvolvido para ajudar no gerenciamento de agendamentos, serviços 
 
 - Plataforma: Android
 - Linguagem: TypeScript
-- Banco de Dados: Supabase
+- Banco de Dados: Firebase
 - UI/UX: Material Design
