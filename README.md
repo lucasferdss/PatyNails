@@ -84,45 +84,6 @@ patynails/
 
 ---
 
-## Configuracao Local
-
-Clone o repositorio e instale as dependencias:
-
-```bash
-npm install
-```
-
-Crie um arquivo `.env` baseado no `.env.example`:
-
-```bash
-cp .env.example .env
-```
-
-Preencha as variaveis com os dados do seu projeto Firebase:
-
-```env
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-```
-
-Execute o projeto em desenvolvimento:
-
-```bash
-npm run dev
-```
-
-Gere a versao de producao:
-
-```bash
-npm run build
-```
-
----
-
 ## Caracteristicas Tecnicas
 
 - **Mobile-first**: interface pensada para uso diario no celular
@@ -135,12 +96,3 @@ npm run build
 - **Deploy SPA**: configurado para funcionar corretamente na Vercel
 
 ---
-
-## Scripts Disponiveis
-
-```bash
-npm run dev       # Inicia o servidor de desenvolvimento
-npm run build     # Gera o build de producao
-npm run preview   # Visualiza o build localmente
-npm run lint      # Executa a verificacao de lint
-```
