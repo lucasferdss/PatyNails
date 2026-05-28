@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,13 @@ export const NewAppointmentDialog = () => {
   const [selectedServiceId, setSelectedServiceId] = useState('');  
   const { services, addAppointment } = useApp();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!selectedServiceId && services.length === 1) {
+      setSelectedServiceId(services[0].id);
+    }
+  }, [selectedServiceId, services]);
+
   const formatDateForStorage = (date: Date) => {
     const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
     const day = String(localDate.getDate()).padStart(2, '0');
@@ -52,11 +59,13 @@ export const NewAppointmentDialog = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const resolvedServiceId = selectedServiceId || (services.length === 1 ? services[0].id : '');
+
     const validation = appointmentSchema.safeParse({
       client_name: clientName,
       date: date,
       time: time,
-      service_id: selectedServiceId,
+      service_id: resolvedServiceId,
     });
 
     if (!validation.success) {
@@ -69,8 +78,15 @@ export const NewAppointmentDialog = () => {
       return;
     }
 
-    const selectedService = services.find(s => s.id === selectedServiceId);
-    if (!selectedService) return;
+    const selectedService = services.find(s => s.id === validation.data.service_id);
+    if (!selectedService) {
+      toast({
+        title: "Erro de Validação",
+        description: "Selecione um serviço válido",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const formattedDate = formatDateForStorage(validation.data.date);
 
