@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/pwa-512x512.png" alt="PatyNails Logo" width="180"/>
+  <img src="public/logo.jpg" alt="PatyNails Logo" width="220"/>
 
   # PatyNails
 
@@ -94,4 +94,3 @@ patynails/
 - **Design Responsivo**: adaptado para mobile e desktop
 - **Componentes Acessiveis**: baseados em Radix UI e shadcn/ui
 - **Deploy SPA**: configurado para funcionar corretamente na Vercel
-

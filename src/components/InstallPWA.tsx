@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Download, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -57,9 +57,11 @@ export const InstallPWA = () => {
   return (
     <Card className="fixed bottom-20 left-4 right-4 mx-auto max-w-md p-4 shadow-lg z-40 bg-card border-primary/20">
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Download className="w-5 h-5 text-primary" />
-        </div>       
+        <img
+          src="/logo.jpg"
+          alt="PatyNails"
+          className="h-10 w-10 flex-shrink-0 rounded-lg object-cover"
+        />
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-sm mb-1">Instalar PatyNails</h3>
           <p className="text-xs text-muted-foreground mb-3">

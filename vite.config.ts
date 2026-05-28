@@ -12,7 +12,7 @@ export default defineConfig(() => ({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'robots.txt'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'logo.jpg', 'robots.txt'],
       manifest: {
         name: 'PatyNails - Gestão de Salão',
         short_name: 'PatyNails',
