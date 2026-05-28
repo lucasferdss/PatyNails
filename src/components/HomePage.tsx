@@ -62,11 +62,6 @@ const HomePage = () => {
   return (
     <div className="px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-20 max-w-md mx-auto animate-fade-in">
       <div className="text-center mb-6">
-        <img
-          src="/logo.jpg"
-          alt="PatyNails"
-          className="mx-auto mb-3 h-24 w-24 rounded-2xl object-cover shadow-sm"
-        />
         <h1 className="text-2xl font-bold text-primary-600 mb-2">PatyNails</h1>
       </div>
       <div className="mb-6">

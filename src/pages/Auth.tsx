@@ -51,11 +51,6 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <img
-            src="/logo.jpg"
-            alt="PatyNails"
-            className="mx-auto mb-3 h-28 w-28 rounded-2xl object-cover shadow-sm"
-          />
           <CardTitle className="text-2xl font-bold">PatyNails</CardTitle>
           <CardDescription>
             Acesse sua conta para gerenciar seu estúdio
