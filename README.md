@@ -95,4 +95,3 @@ patynails/
 - **Componentes Acessiveis**: baseados em Radix UI e shadcn/ui
 - **Deploy SPA**: configurado para funcionar corretamente na Vercel
 
----
