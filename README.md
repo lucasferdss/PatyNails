@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/logo.jpg" alt="PatyNails Logo" width="220"/>
+  <img src="public/logo-removebg.png" alt="PatyNails Logo" width="220"/>
 
   # PatyNails
 
